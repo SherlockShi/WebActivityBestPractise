@@ -43,6 +43,8 @@ public class WebActivity extends AppCompatActivity {
                 .createAgentWeb()
                 .ready()
                 .go(mUrl);
+
+        mAgentWeb.getJsInterfaceHolder().addJavaObject("android", new AndroidInterface(mAgentWeb,this));
     }
 
     private void initUrl() {
