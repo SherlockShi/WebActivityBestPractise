@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.webkit.JavascriptInterface;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.just.agentweb.AgentWeb;
 
 /**
@@ -26,13 +27,23 @@ public class AndroidInterface {
 
     @JavascriptInterface
     public void logout() {
-
         deliver.post(new Runnable() {
             @Override
             public void run() {
+                ToastUtils.showShort("账号被登录，需配置跳转到登录界面");
 //                LoginHelper.getInstance().logout();
 //                mActivity.startActivity(new Intent(mActivity, LoginActivity.class));
 //                mActivity.finish();
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void showToast(final String msg) {
+        deliver.post(new Runnable() {
+            @Override
+            public void run() {
+                ToastUtils.showShort(msg);
             }
         });
     }

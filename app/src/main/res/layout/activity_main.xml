@@ -15,5 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="一、基础功能"/>
+
+        <Button
+            android:id="@+id/btn2_jsinterface"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:text="二、JsInterface"
+            android:textAllCaps="false"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

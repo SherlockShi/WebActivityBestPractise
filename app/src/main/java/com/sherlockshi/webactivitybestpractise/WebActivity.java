@@ -29,7 +29,8 @@ import com.just.agentweb.WebViewClient;
 
 public class WebActivity extends AppCompatActivity {
 
-    private static final String TITLE_KEY = "title";
+    private static final String URL_KEY     = "url";
+    private static final String TITLE_KEY   = "title";
 
     private AgentWeb mAgentWeb;
 
@@ -38,12 +39,13 @@ public class WebActivity extends AppCompatActivity {
     private String mTitle;
     private String mUrl;
 
-    public static Intent getIntent(Context context) {
-        return getIntent(context, "");
+    public static Intent getIntent(Context context, String url) {
+        return getIntent(context, url, "");
     }
 
-    public static Intent getIntent(Context context, String title) {
+    public static Intent getIntent(Context context, String url, String title) {
         Intent intent = new Intent(context, WebActivity.class);
+        intent.putExtra(URL_KEY, url);
         intent.putExtra(TITLE_KEY, title);
         return intent;
     }
@@ -54,8 +56,7 @@ public class WebActivity extends AppCompatActivity {
         setContentView(R.layout.activity_web);
 
         mTitle = getIntent().getStringExtra(TITLE_KEY);
-
-        initUrl();
+        mUrl = getIntent().getStringExtra(URL_KEY);
 
         mBridgeWebView = new BridgeWebView(WebActivity.this);
         mAgentWeb = AgentWeb.with(this)
@@ -91,10 +92,6 @@ public class WebActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void initUrl() {
-        mUrl = "http://www.jd.com";
     }
 
     private void setWebSetting() {

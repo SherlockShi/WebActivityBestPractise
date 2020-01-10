@@ -23,8 +23,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn1_basic_function).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(WebActivity.getIntent(MainActivity.this));
-//                startActivity(WebActivity.getIntent(MainActivity.this, "一、基础功能"));
+                startActivity(WebActivity.getIntent(MainActivity.this, "http://www.jd.com"));
+//                startActivity(WebActivity.getIntent(MainActivity.this, "http://www.jd.com", "一、基础功能"));
+            }
+        });
+
+        // 二、JsInterface
+        findViewById(R.id.btn2_jsinterface).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(WebActivity.getIntent(MainActivity.this, "file:///android_asset/function2_JavascriptInterface.html"));
             }
         });
     }
