@@ -80,3 +80,115 @@ public void pay(String data) {
 // Javascript 调用方式：window.android.logout();
 mAgentWeb.getJsInterfaceHolder().addJavaObject("android", new AndroidInterface(mAgentWeb,this));
 ```
+
+# 三、JsBridge
+### 1、引入 JsBridge
+参考 [JsBridge - JitPack.io](https://github.com/lzyzsd/JsBridge#jitpackio)
+
+```groovy
+repositories {
+    // ...
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation 'com.github.lzyzsd:jsbridge:1.0.4'
+}
+```
+
+### 2、JsBridge 配合 AgentWeb 使用
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ...
+    
+    mBridgeWebView = new BridgeWebView(WebActivity.this);
+    mAgentWeb = AgentWeb.with(this)
+            .setAgentWebParent((LinearLayout) findViewById(R.id.llyt_container), new LinearLayout.LayoutParams(-1, -1))
+            .useDefaultIndicator()
+            .setWebChromeClient(mWebChromeClient)
+            .setWebViewClient(getWebViewClient())
+            .setWebView(mBridgeWebView)
+            .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
+            .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
+            .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)//打开其他应用时，弹窗咨询用户是否前往其他应用
+            .interceptUnkownUrl() //拦截找不到相关页面的Scheme
+            .createAgentWeb()
+            .ready()
+            .go(mUrl);
+    
+    setWebSetting();
+
+    mAgentWeb.getJsInterfaceHolder().addJavaObject("android", new AndroidInterface(mAgentWeb,this));
+
+    mBridgeWebView.registerHandler("YHJavaScriptCallHandler", new BridgeHandler() {
+        @Override
+        public void handler(String data, CallBackFunction function) {
+            JsBridgeBaseEntity entity = GsonUtils.fromJson(data, JsBridgeBaseEntity.class);
+            if (entity != null) {
+                // 退出登录
+                if (TextUtils.equals(entity.getMethod(), "logout")) {
+//                    LoginHelper.getInstance().logout();
+//                    startActivity(new Intent(WebActivity.this, LoginActivity.class));
+//                    finish();
+                }
+            }
+        }
+    });
+}
+
+private void setWebSetting() {
+    // H5 用于判断是否为 APP 的依据：COM_MSTPAY
+    WebSettings webSettings = mAgentWeb.getAgentWebSettings().getWebSettings();
+    String ua = webSettings.getUserAgentString();
+    ua = ua + ";COM_MSTPAY(RYT)/" + AppUtils.getAppVersionCode();
+    webSettings.setUserAgentString(ua);
+}
+
+private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
+    @Override
+    public void onReceivedTitle(WebView view, String title) {
+        super.onReceivedTitle(view, title);
+    }
+
+    @Override
+    public void onPermissionRequest(PermissionRequest request) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            request.grant(request.getResources());
+        }
+    }
+};
+
+private WebViewClient getWebViewClient(){
+    return new WebViewClient() {
+        BridgeWebViewClient mBridgeWebViewClient = new BridgeWebViewClient(mBridgeWebView);
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, request);  //兼容高版本，必须设置
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, url);    //兼容低版本，必须设置
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            mBridgeWebViewClient.onPageStarted(view, url, favicon);  //必须设置
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            mBridgeWebViewClient.onPageFinished(view, url); //必须设置
+        }
+
+    };
+}
+```
+### 3、报错 ERR_UNKNOWN_URL_SCHEME
+[AgentWeb调用JsBridge采坑记录](http://www.appblog.cn/2019/10/27/AgentWeb%E8%B0%83%E7%94%A8JsBridge%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/)

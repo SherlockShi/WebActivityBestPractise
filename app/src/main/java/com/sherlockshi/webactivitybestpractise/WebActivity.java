@@ -2,18 +2,38 @@ package com.sherlockshi.webactivitybestpractise;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.webkit.PermissionRequest;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.GsonUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.github.lzyzsd.jsbridge.BridgeHandler;
+import com.github.lzyzsd.jsbridge.BridgeWebView;
+import com.github.lzyzsd.jsbridge.BridgeWebViewClient;
+import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.just.agentweb.AgentWeb;
+import com.just.agentweb.DefaultWebClient;
+import com.just.agentweb.WebChromeClient;
+import com.just.agentweb.WebViewClient;
 
 public class WebActivity extends AppCompatActivity {
 
     private static final String TITLE_KEY = "title";
 
     private AgentWeb mAgentWeb;
+
+    private BridgeWebView mBridgeWebView;
 
     private String mTitle;
     private String mUrl;
@@ -37,18 +57,95 @@ public class WebActivity extends AppCompatActivity {
 
         initUrl();
 
+        mBridgeWebView = new BridgeWebView(WebActivity.this);
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent((LinearLayout) findViewById(R.id.llyt_container), new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
+                .setWebChromeClient(mWebChromeClient)
+                .setWebViewClient(getWebViewClient())
+                .setWebView(mBridgeWebView)
+                .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
+                .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
+                .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)//打开其他应用时，弹窗咨询用户是否前往其他应用
+                .interceptUnkownUrl() //拦截找不到相关页面的Scheme
                 .createAgentWeb()
                 .ready()
                 .go(mUrl);
 
+        setWebSetting();
+
         mAgentWeb.getJsInterfaceHolder().addJavaObject("android", new AndroidInterface(mAgentWeb,this));
+
+        mBridgeWebView.registerHandler("YHJavaScriptCallHandler", new BridgeHandler() {
+            @Override
+            public void handler(String data, CallBackFunction function) {
+                JsBridgeBaseEntity entity = GsonUtils.fromJson(data, JsBridgeBaseEntity.class);
+                if (entity != null) {
+                    // 退出登录
+                    if (TextUtils.equals(entity.getMethod(), "logout")) {
+                        ToastUtils.showShort("账号被登录，需配置跳转到登录界面");
+//                        LoginHelper.getInstance().logout();
+//                        startActivity(new Intent(WebActivity.this, LoginActivity.class));
+//                        finish();
+                    }
+                }
+            }
+        });
     }
 
     private void initUrl() {
         mUrl = "http://www.jd.com";
+    }
+
+    private void setWebSetting() {
+        // H5 用于判断是否为 APP 的依据：COM_MSTPAY
+        WebSettings webSettings = mAgentWeb.getAgentWebSettings().getWebSettings();
+        String ua = webSettings.getUserAgentString();
+        ua = ua + ";COM_MSTPAY(RYT)/" + AppUtils.getAppVersionCode();
+        webSettings.setUserAgentString(ua);
+    }
+
+    private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+        }
+
+        @Override
+        public void onPermissionRequest(PermissionRequest request) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                request.grant(request.getResources());
+            }
+        }
+    };
+
+    private WebViewClient getWebViewClient(){
+        return new WebViewClient() {
+            BridgeWebViewClient mBridgeWebViewClient = new BridgeWebViewClient(mBridgeWebView);
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return mBridgeWebViewClient.shouldOverrideUrlLoading(view, request);  //兼容高版本，必须设置
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return mBridgeWebViewClient.shouldOverrideUrlLoading(view, url);    //兼容低版本，必须设置
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                mBridgeWebViewClient.onPageStarted(view, url, favicon);  //必须设置
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                mBridgeWebViewClient.onPageFinished(view, url); //必须设置
+            }
+
+        };
     }
 
     @Override
@@ -64,7 +161,7 @@ public class WebActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         mAgentWeb.getWebLifeCycle().onDestroy();
         super.onDestroy();
     }
