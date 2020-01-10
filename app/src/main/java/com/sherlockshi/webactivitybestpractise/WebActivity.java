@@ -7,11 +7,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.PermissionRequest;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +27,7 @@ import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.BridgeWebViewClient;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.just.agentweb.AgentWeb;
+import com.just.agentweb.AgentWebConfig;
 import com.just.agentweb.DefaultWebClient;
 import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
@@ -32,6 +36,10 @@ public class WebActivity extends AppCompatActivity {
 
     private static final String URL_KEY     = "url";
     private static final String TITLE_KEY   = "title";
+
+    private LinearLayout llytToolBarLeft;
+    private LinearLayout llytToolBarClose;
+    private TextView tvToolBarTitle;
 
     private AgentWeb mAgentWeb;
 
@@ -56,7 +64,14 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
+        // 清空缓存
+        AgentWebConfig.clearDiskCache(this);
+
+        initView();
+
         mTitle = getIntent().getStringExtra(TITLE_KEY);
+        tvToolBarTitle.setText(mTitle);
+
         mUrl = getIntent().getStringExtra(URL_KEY);
 
         mBridgeWebView = new BridgeWebView(WebActivity.this);
@@ -97,6 +112,26 @@ public class WebActivity extends AppCompatActivity {
         });
     }
 
+    private void initView() {
+        llytToolBarLeft = findViewById(R.id.llyt_tool_bar_left);
+        llytToolBarClose = findViewById(R.id.llyt_tool_bar_close);
+        tvToolBarTitle = findViewById(R.id.tv_tool_bar_title);
+
+        llytToolBarLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        llytToolBarClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
+
     private void setWebSetting() {
         // H5 用于判断是否为 APP 的依据：COM_MSTPAY
         WebSettings webSettings = mAgentWeb.getAgentWebSettings().getWebSettings();
@@ -109,6 +144,9 @@ public class WebActivity extends AppCompatActivity {
         @Override
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
+            if (!TextUtils.isEmpty(title)) {
+                tvToolBarTitle.setText(title);
+            }
         }
 
         @Override
@@ -143,8 +181,13 @@ public class WebActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 mBridgeWebViewClient.onPageFinished(view, url); //必须设置
-            }
 
+                if (mAgentWeb.getWebCreator().getWebView().canGoBack()) {
+                    llytToolBarClose.setVisibility(View.VISIBLE);
+                } else {
+                    llytToolBarClose.setVisibility(View.GONE);
+                }
+            }
         };
     }
 
@@ -164,5 +207,22 @@ public class WebActivity extends AppCompatActivity {
     protected void onDestroy() {
         mAgentWeb.getWebLifeCycle().onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mAgentWeb.handleKeyEvent(keyCode, event)) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mAgentWeb.back()) {
+            mAgentWeb.getWebCreator().getWebView().goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
