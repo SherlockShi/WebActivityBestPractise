@@ -1,0 +1,20 @@
+<!-- 参考文档：android与js的交互之jsbridge使用 https://juejin.im/post/5ac044a8518825557459d603 -->
+<!DOCTYPE html>
+<html>
+<script type="text/javascript">
+    function logoutClick(){
+       var data='{"method":"logout","param":"","callback":""}';
+       window.WebViewJavascriptBridge.callHandler(
+           'YHJavaScriptCallHandler' //指定接收参数需与 Java 一致
+           ,data
+           ,function(responseData) { //处理java回传的数据
+           }
+       );
+    }
+</script>
+
+<body>
+<input type="button" onClick="logoutClick()" value="logout">
+</body>
+
+</html>

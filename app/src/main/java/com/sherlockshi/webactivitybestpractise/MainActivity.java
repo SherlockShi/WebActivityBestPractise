@@ -35,5 +35,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(WebActivity.getIntent(MainActivity.this, "file:///android_asset/function2_JavascriptInterface.html"));
             }
         });
+
+        // 三、JsBridge
+        findViewById(R.id.btn3_jsbridge).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(WebActivity.getIntent(MainActivity.this, "file:///android_asset/function3_JsBridge.html"));
+            }
+        });
     }
 }

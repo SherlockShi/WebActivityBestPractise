@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.PermissionRequest;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -80,6 +81,8 @@ public class WebActivity extends AppCompatActivity {
         mBridgeWebView.registerHandler("YHJavaScriptCallHandler", new BridgeHandler() {
             @Override
             public void handler(String data, CallBackFunction function) {
+                Log.d("JsBridge123", data);
+
                 JsBridgeBaseEntity entity = GsonUtils.fromJson(data, JsBridgeBaseEntity.class);
                 if (entity != null) {
                     // 退出登录

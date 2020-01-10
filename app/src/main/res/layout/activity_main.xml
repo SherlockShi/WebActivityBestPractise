@@ -23,5 +23,13 @@
             android:layout_marginTop="10dp"
             android:text="二、JsInterface"
             android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/btn3_jsbridge"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:text="三、JsBridge"
+            android:textAllCaps="false"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
