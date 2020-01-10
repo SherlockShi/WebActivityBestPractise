@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.GsonUtils;
@@ -37,6 +38,7 @@ public class WebActivity extends AppCompatActivity {
     private static final String URL_KEY     = "url";
     private static final String TITLE_KEY   = "title";
 
+    private Toolbar mToolbar;
     private LinearLayout llytToolBarLeft;
     private LinearLayout llytToolBarClose;
     private TextView tvToolBarTitle;
@@ -107,6 +109,18 @@ public class WebActivity extends AppCompatActivity {
 //                        startActivity(new Intent(WebActivity.this, LoginActivity.class));
 //                        finish();
                     }
+                    // 隐藏标题栏
+                    else if (TextUtils.equals(entity.getMethod(), "hideToolbar")) {
+                        if (mToolbar.getVisibility() == View.VISIBLE) {
+                            mToolbar.setVisibility(View.GONE);
+                        }
+                    }
+                    // 显示标题栏
+                    else if (TextUtils.equals(entity.getMethod(), "showToolbar")) {
+                        if (mToolbar.getVisibility() == View.GONE) {
+                            mToolbar.setVisibility(View.VISIBLE);
+                        }
+                    }
                 }
             }
         });
@@ -116,6 +130,7 @@ public class WebActivity extends AppCompatActivity {
         llytToolBarLeft = findViewById(R.id.llyt_tool_bar_left);
         llytToolBarClose = findViewById(R.id.llyt_tool_bar_close);
         tvToolBarTitle = findViewById(R.id.tv_tool_bar_title);
+        mToolbar = findViewById(R.id.toolbar);
 
         llytToolBarLeft.setOnClickListener(new View.OnClickListener() {
             @Override

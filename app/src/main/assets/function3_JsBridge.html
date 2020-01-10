@@ -11,10 +11,32 @@
            }
        );
     }
+
+    function hideToolbarClick(){
+       var data='{"method":"hideToolbar","param":"","callback":""}';
+       window.WebViewJavascriptBridge.callHandler(
+           'YHJavaScriptCallHandler' //指定接收参数需与 Java 一致
+           ,data
+           ,function(responseData) { //处理java回传的数据
+           }
+       );
+    }
+
+    function showToolbarClick(){
+       var data='{"method":"showToolbar","param":"","callback":""}';
+       window.WebViewJavascriptBridge.callHandler(
+           'YHJavaScriptCallHandler' //指定接收参数需与 Java 一致
+           ,data
+           ,function(responseData) { //处理java回传的数据
+           }
+       );
+    }
 </script>
 
 <body>
 <input type="button" onClick="logoutClick()" value="logout">
+<input type="button" onClick="hideToolbarClick()" value="hideToolbar">
+<input type="button" onClick="showToolbarClick()" value="showToolbar">
 </body>
 
 </html>
