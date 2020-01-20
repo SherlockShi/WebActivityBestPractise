@@ -233,3 +233,47 @@ private boolean shouldOverrideUrlLoading(String url) {
     return false;
 }
 ```
+
+### 2、打开应用商店搜索包名对应的应用
+
+```java
+private WebViewClient getWebViewClient(){
+    return new WebViewClient() {
+        BridgeWebViewClient mBridgeWebViewClient = new BridgeWebViewClient(mBridgeWebView);
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
+            if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                return true;
+            }
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, request);  //兼容高版本，必须设置
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                return true;
+            }
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, url);    //兼容低版本，必须设置
+        }
+
+        ...
+    };
+}
+
+private boolean shouldOverrideUrlLoading(String url) {
+    if (TextUtils.equals(Uri.parse(url).getScheme(), "market")) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        try {
+            // 解决Bug：模拟器未装应用商店，导致 ActivityNotFoundException 崩溃
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+    return false;
+}
+```

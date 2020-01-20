@@ -1,5 +1,6 @@
 package com.sherlockshi.webactivitybestpractise;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -215,9 +216,15 @@ public class WebActivity extends AppCompatActivity {
     }
 
     private boolean shouldOverrideUrlLoading(String url) {
-        if (TextUtils.equals(Uri.parse(url).getScheme(), "tel")) {
+        if (TextUtils.equals(Uri.parse(url).getScheme(), "tel")
+                || TextUtils.equals(Uri.parse(url).getScheme(), "market")) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
+            try {
+                // 解决Bug：模拟器未装应用商店，导致 ActivityNotFoundException 崩溃
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+            }
             return true;
         }
         return false;

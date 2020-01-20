@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="10dp"
-            android:text="四、一些小功能  1、拨打电话"
+            android:text="四、一些小功能"
             android:textAllCaps="false"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
