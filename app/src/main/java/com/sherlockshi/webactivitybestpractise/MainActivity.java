@@ -43,5 +43,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(WebActivity.getIntent(MainActivity.this, "file:///android_asset/function3_JsBridge.html"));
             }
         });
+
+        // 四、一些小功能
+        // 1、拨打电话
+        findViewById(R.id.btn41_call_phone).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(WebActivity.getIntent(MainActivity.this, "file:///android_asset/function4_some_function.html"));
+            }
+        });
     }
 }

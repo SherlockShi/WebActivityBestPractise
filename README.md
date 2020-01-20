@@ -192,3 +192,44 @@ private WebViewClient getWebViewClient(){
 ```
 ### 3、报错 ERR_UNKNOWN_URL_SCHEME
 [AgentWeb调用JsBridge采坑记录](http://www.appblog.cn/2019/10/27/AgentWeb%E8%B0%83%E7%94%A8JsBridge%E9%87%87%E5%9D%91%E8%AE%B0%E5%BD%95/)
+
+# 四、一些小功能
+
+### 1、拨打电话
+
+```java
+private WebViewClient getWebViewClient(){
+    return new WebViewClient() {
+        BridgeWebViewClient mBridgeWebViewClient = new BridgeWebViewClient(mBridgeWebView);
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
+            if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                return true;
+            }
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, request);  //兼容高版本，必须设置
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                return true;
+            }
+            return mBridgeWebViewClient.shouldOverrideUrlLoading(view, url);    //兼容低版本，必须设置
+        }
+
+        ...
+    };
+}
+
+private boolean shouldOverrideUrlLoading(String url) {
+    if (TextUtils.equals(Uri.parse(url).getScheme(), "tel")) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(intent);
+        return true;
+    }
+    return false;
+}
+```

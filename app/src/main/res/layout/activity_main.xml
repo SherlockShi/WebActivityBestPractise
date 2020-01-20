@@ -31,5 +31,13 @@
             android:layout_marginTop="10dp"
             android:text="三、JsBridge"
             android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/btn41_call_phone"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:text="四、一些小功能  1、拨打电话"
+            android:textAllCaps="false"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

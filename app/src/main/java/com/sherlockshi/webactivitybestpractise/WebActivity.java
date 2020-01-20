@@ -3,6 +3,7 @@ package com.sherlockshi.webactivitybestpractise;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -179,11 +180,18 @@ public class WebActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                    return true;
+                }
                 return mBridgeWebViewClient.shouldOverrideUrlLoading(view, request);  //兼容高版本，必须设置
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (WebActivity.this.shouldOverrideUrlLoading(url)) {
+                    return true;
+                }
                 return mBridgeWebViewClient.shouldOverrideUrlLoading(view, url);    //兼容低版本，必须设置
             }
 
@@ -204,6 +212,15 @@ public class WebActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private boolean shouldOverrideUrlLoading(String url) {
+        if (TextUtils.equals(Uri.parse(url).getScheme(), "tel")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
 
     @Override
