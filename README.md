@@ -308,3 +308,12 @@ private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient
     }
 };
 ```
+
+# 附录
+### 1、JsBridge 方法汇总
+
+| 序号 | 方法名 | 功能描述 |
+| :-: | --- | --- |
+| 1 | logout | 退出登录 |
+| 2 | hideToolbar | 隐藏标题栏 |
+| 3 | showToolbar | 显示标题栏 |
