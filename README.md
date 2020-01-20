@@ -277,3 +277,34 @@ private boolean shouldOverrideUrlLoading(String url) {
     return false;
 }
 ```
+
+### 3、拍照/选择文件
+
+##### 3.1 引入 filechooser
+
+```groovy
+api 'com.just.agentweb:filechooser:4.1.2'
+```
+
+##### 3.2 清单文件添加权限
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
+##### 3.3 代码动态请求权限
+
+```java
+private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
+    ...
+
+    @Override
+    public void onPermissionRequest(PermissionRequest request) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            request.grant(request.getResources());
+        }
+    }
+};
+```
