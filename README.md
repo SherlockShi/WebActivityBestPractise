@@ -309,6 +309,13 @@ private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient
 };
 ```
 
+### 4、清理缓存
+
+```java
+mAgentWeb.clearWebCache();
+AgentWebConfig.clearDiskCache(this);
+```
+
 # 附录
 ### 1、JsBridge 方法汇总
 

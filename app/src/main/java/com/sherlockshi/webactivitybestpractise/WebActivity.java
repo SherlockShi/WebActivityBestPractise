@@ -68,9 +68,6 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
-        // 清空缓存
-        AgentWebConfig.clearDiskCache(this);
-
         initView();
 
         mTitle = getIntent().getStringExtra(TITLE_KEY);
@@ -92,6 +89,8 @@ public class WebActivity extends AppCompatActivity {
                 .createAgentWeb()
                 .ready()
                 .go(mUrl);
+
+        clearWebViewCache();
 
         setWebSetting();
 
@@ -126,6 +125,12 @@ public class WebActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void clearWebViewCache() {
+        // 清空缓存
+        mAgentWeb.clearWebCache();
+        AgentWebConfig.clearDiskCache(this);
     }
 
     private void initView() {
