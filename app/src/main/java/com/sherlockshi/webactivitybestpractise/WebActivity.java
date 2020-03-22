@@ -160,6 +160,18 @@ public class WebActivity extends AppCompatActivity {
         String ua = webSettings.getUserAgentString();
         ua = ua + ";COM_MSTPAY(RYT)/" + AppUtils.getAppVersionCode();
         webSettings.setUserAgentString(ua);
+
+        //支持javascript
+        webSettings.setJavaScriptEnabled(true);
+        // 设置可以支持缩放
+        webSettings.setSupportZoom(true);
+        // 设置出现缩放工具
+        webSettings.setBuiltInZoomControls(true);
+        //扩大比例的缩放
+        webSettings.setUseWideViewPort(true);
+        //自适应屏幕
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        webSettings.setLoadWithOverviewMode(true);
     }
 
     private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
