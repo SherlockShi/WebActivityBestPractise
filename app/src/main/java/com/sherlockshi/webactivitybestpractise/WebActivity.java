@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -172,6 +173,15 @@ public class WebActivity extends AppCompatActivity {
         //自适应屏幕
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webSettings.setLoadWithOverviewMode(true);
+
+        // 解决 Android 5.1 手机无法播放 video 标签视频的问题，视频可使用这个测试：https://mp.weixin.qq.com/s/eNN3nur-lx81OJsSvezROg
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        webSettings.setAllowFileAccess(true); // 允许访问文件
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE); // 不加载缓存内容
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
     }
 
     private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
@@ -187,6 +197,15 @@ public class WebActivity extends AppCompatActivity {
         public void onPermissionRequest(PermissionRequest request) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 request.grant(request.getResources());
+            }
+        }
+
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            if (super.getDefaultVideoPoster() == null) {
+                return BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+            } else {
+                return super.getDefaultVideoPoster();
             }
         }
     };
