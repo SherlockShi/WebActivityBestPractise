@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.PermissionRequest;
@@ -188,7 +189,7 @@ public class WebActivity extends AppCompatActivity {
         @Override
         public void onReceivedTitle(WebView view, String title) {
             super.onReceivedTitle(view, title);
-            if (!TextUtils.isEmpty(title)) {
+            if (!TextUtils.isEmpty(title) && !Patterns.WEB_URL.matcher(title).matches()) {
                 tvToolBarTitle.setText(title);
             }
         }
